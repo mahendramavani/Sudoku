@@ -32,7 +32,7 @@ namespace Sudoku.Console
 
             Board board;
             board = new Board(initialInputs);
-            board.PrintCurrentSolution();
+            //board.PrintCurrentSolution();
             board.Solve();
             board.PrintCurrentSolution();
 

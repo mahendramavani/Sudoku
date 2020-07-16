@@ -16,10 +16,14 @@ namespace Sudoku.Core
         public bool ProcessedAsColumnTriplet { get; set; }
         public bool ProcessedAsBoxTriplet { get; set; }
 
-        public int X { get; }
-        public int Y { get; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
         public int Value { get; private set; }
         public ValueType Type { get; private set; }
+        public List<int> PossibleValues => _possibleValues;
+        public List<int> EliminatedValues => _eliminatedValues;
+
+        private Point() { }
 
         public Point(int x, int y, int initialValue)
         {
@@ -45,6 +49,16 @@ namespace Sudoku.Core
             {
                 _possibleValues.Clear();
                 Type = ValueType.Calculated;
+                Value = val;
+            }
+        }
+        
+        public void GuessValue(int val)
+        {
+            if (val != 0)
+            {
+                _possibleValues.Clear();
+                Type = ValueType.Guessed;
                 Value = val;
             }
         }
@@ -110,6 +124,7 @@ namespace Sudoku.Core
             {
                 _possibleValues.Remove(eliminatedValue);
             }
+          
             if (_possibleValues.Count == 1)
             {
                 SetValue(_possibleValues[0]);
@@ -134,6 +149,26 @@ namespace Sudoku.Core
             {
                 SetValue(_possibleValues[0]);
             }
+        }
+
+        public Point ShallowCopy()
+        {
+            var point = new Point
+            {
+                X = this.X,
+                Y = this.Y,
+                Value = this.Value,
+                Type = this.Type,
+                ProcessedAsRowPair = this.ProcessedAsRowPair,
+                ProcessedAsColumnPair = this.ProcessedAsColumnPair,
+                ProcessedAsBoxPair = this.ProcessedAsBoxPair,
+                ProcessedAsRowTriplet = this.ProcessedAsRowTriplet,
+                ProcessedAsColumnTriplet = this.ProcessedAsColumnTriplet,
+                ProcessedAsBoxTriplet = this.ProcessedAsBoxTriplet,
+                _possibleValues = new List<int>(this.PossibleValues),
+                _eliminatedValues = new List<int>(this.EliminatedValues),
+            };
+            return point;
         }
     }
 
