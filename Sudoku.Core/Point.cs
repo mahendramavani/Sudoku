@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Sudoku
+namespace Sudoku.Core
 {
     public class Point : IEquatable<Point>
     {
@@ -102,13 +102,37 @@ namespace Sudoku
             }
         }
 
-        public void SetPossibleValues(List<int> possibleValues)
+        public bool CheckIfSolutionIsReachedAfterSettingThePossibleValues(List<int> possibleValues)
         {
             _possibleValues = possibleValues?? new List<int>();
 
             foreach (var eliminatedValue in _eliminatedValues)
             {
                 _possibleValues.Remove(eliminatedValue);
+            }
+            if (_possibleValues.Count == 1)
+            {
+                SetValue(_possibleValues[0]);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void MatchPossibleValuesWith(Point point)
+        {
+            var possibleValues = point.GetPossibleValues();
+            var removeList = _possibleValues.Except(possibleValues).ToArray();
+
+            foreach (var value in removeList)
+            {
+                _possibleValues.Remove(value);
+                _eliminatedValues.Add(value);
+            }
+
+            if (_possibleValues.Count == 1)
+            {
+                SetValue(_possibleValues[0]);
             }
         }
     }
