@@ -32,6 +32,7 @@ namespace Sudoku.Core
             Value = initialValue;
             Type = (initialValue == 0 ? ValueType.Unknown : ValueType.Given);
         }
+
         public int[] GetPossibleValues()
         {
             _possibleValues.Sort();
@@ -61,11 +62,6 @@ namespace Sudoku.Core
                 Type = ValueType.Guessed;
                 Value = val;
             }
-        }
-
-        public void AddPossibleValue(int possibleValue)
-        {
-            _possibleValues.Add(possibleValue);
         }
 
         public bool PossibleValuesAreOfSize(int size)
