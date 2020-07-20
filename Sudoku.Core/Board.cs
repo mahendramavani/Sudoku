@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sudoku.Core
 {
@@ -8,7 +9,8 @@ namespace Sudoku.Core
         //http://pi.math.cornell.edu/~mec/Summer2009/meerkamp/Site/Solving_any_Sudoku_II.html
         private const int SUDOKU_INNER_SIZE = 3;
         private const int SUDOKU_SIZE = SUDOKU_INNER_SIZE * SUDOKU_INNER_SIZE;
-        private int _iterationCount;
+        private int _iterationCountForPlaceFindingAndPreemptiveSet;
+        private int _iteratoinCountForCandidateChecking;
         private readonly Point[,] _points = new Point[SUDOKU_SIZE,SUDOKU_SIZE];
         private readonly Point[,] _knownPoints = new Point[SUDOKU_SIZE,SUDOKU_SIZE];
         
@@ -32,9 +34,9 @@ namespace Sudoku.Core
 
         private void Iterate()
         {
-            if (_iterationCount++ >= 1000)
+            if (_iterationCountForPlaceFindingAndPreemptiveSet++ >= 1000)
             {
-                Console.Out.WriteLine($"Completed {_iterationCount} iteration but still No solution is reached.");
+                Console.Out.WriteLine($"Completed {_iterationCountForPlaceFindingAndPreemptiveSet} iteration of PlaceFinding and PreemptiveSet but still No solution is reached.");
                 return;
             }
 
@@ -116,8 +118,7 @@ namespace Sudoku.Core
                 }
                 else
                 {
-                    var solutionReachedForThePoint =
-                        point.CheckIfSolutionIsReachedAfterSettingThePossibleValues(possibleValues);
+                    var solutionReachedForThePoint = point.CheckIfSolutionIsReachedAfterSettingThePossibleValues(possibleValues);
                     if (solutionReachedForThePoint)
                     {
                         anyPointReachedSolution = true;
@@ -152,24 +153,15 @@ namespace Sudoku.Core
 
         private void TryWithPotentialCandidate()
         {
-            PrintCurrentSolution();
-            SaveCurrentStatus();
-
-            Point selectedPoint = null;
-            for (var y = 0; y < SUDOKU_SIZE; y++)
+            if (_iteratoinCountForCandidateChecking++ > 10)
             {
-                for (var x = 0; x < SUDOKU_SIZE; x++)
-                {
-                    if (_points[x, y].PossibleValuesAreOfSize(2))
-                    {
-                        selectedPoint = _points[x,y];
-                        break;
-                    }
-                }
-
-                if(selectedPoint != null)
-                    break;
+                Console.Out.WriteLine($"Completed {_iteratoinCountForCandidateChecking} iteration of CandidateFinding but still No solution is reached.");
+                return;
             }
+
+            PrintCurrentSolution();
+            
+            var selectedPoint = ChooseFirstPointWithTwoPossibilities();
 
             if (selectedPoint == null)
             {
@@ -177,45 +169,86 @@ namespace Sudoku.Core
                 return;
             }
 
-            var smallerValue = selectedPoint.GetPossibleValues()[0];
-            var biggerValue = selectedPoint.GetPossibleValues()[1];
+            var possibleValues = selectedPoint.GetPossibleValues();
+            var smallerValue = possibleValues[0];
+            var biggerValue = possibleValues[1];
             
-            // Console.Out.WriteLine($"Selecting point ({selectedPoint.X},{selectedPoint.Y}) for substitution");
-            // Console.Out.WriteLine($"substitue value:{smallerValue}");
-            // Console.Out.WriteLine($"Other value:{biggerValue}");
+            Console.Out.WriteLine($"Selecting point ({selectedPoint.X},{selectedPoint.Y}) for substitution. Possible Values=[{possibleValues[0]},{possibleValues[1]}]");
 
+            SaveCurrentStatus();
             selectedPoint.GuessValue(smallerValue);//First try the smaller value
             PlaceFinding();
+            PrintCurrentSolution();
             if (HasViolatedCondition())
             {
-                // Console.Out.WriteLine($"Violation detected. Reverting back to known valid state");
-                RevertToLastKnownStatus();
-                selectedPoint = _points[selectedPoint.X, selectedPoint.Y]; //refresh the selectedPoint
-                // PrintCurrentSolution();
-
-                selectedPoint.SetValue(biggerValue); //Now, we know the valid value must be the remaining one
-                // Console.Out.WriteLine($"Status after setting bigger value");
-                // PrintCurrentSolution();
-                Iterate();
+                Console.Out.WriteLine($"Violation detected after PlaceFinding. Reverting back to last known valid state");
+                TryWithSecondValue(selectedPoint,biggerValue);
             }
             else
             {
-                // Console.Out.WriteLine($"PlaceFinding was successful. Here is the latest state");
-                PrintCurrentSolution();
-
                 PreemptiveSet();
+                PrintCurrentSolution();
                 if (HasViolatedCondition())
                 {
-                    RevertToLastKnownStatus();
-                    selectedPoint = _points[selectedPoint.X, selectedPoint.Y]; //refresh the selectedPoint
-                    selectedPoint.SetValue(biggerValue); //Now, we know the valid value must be the remaining one
-                    Iterate();
+                    Console.Out.WriteLine($"Violation detected after PreemptiveSet finding. Reverting back to last known valid state");
+                    TryWithSecondValue(selectedPoint,biggerValue);
                 }
-                // else
-                // {
-                //     //Answer
-                // }
+                else
+                {
+                    PlaceFinding();
+                    PrintCurrentSolution();
+                    if (HasViolatedCondition())
+                    {
+                        Console.Out.WriteLine($"Violation detected after second round of PlaceFinding. Reverting back to last known valid state");
+                        TryWithSecondValue(selectedPoint, biggerValue);
+                    }
+                    else
+                    {
+                        Console.Out.WriteLine($"All good so far. First value is the right choice");
+                    }
+                }
             }
+
+            if (!IsSolutionReached())
+            {
+                Console.WriteLine($"Press enter to Start round {_iteratoinCountForCandidateChecking} of CandidateFinding");
+                Console.ReadLine();
+                Console.Clear();
+                TryWithPotentialCandidate();
+            }
+        }
+
+        private void TryWithSecondValue(Point selectedPoint,int secondValue)
+        {
+            PrintCurrentSolution();
+            Console.Out.WriteLine($"Status before reverting(above) and after Reverting back to valid state(below)");
+
+            RevertToLastKnownStatus();
+            PrintCurrentSolution();
+
+            selectedPoint = _points[selectedPoint.X, selectedPoint.Y];
+            selectedPoint.SetValue(secondValue); //Now, we know the valid value must be the remaining one
+            
+            Console.Out.WriteLine($"Now selecting second value [Point({selectedPoint.X},{selectedPoint.Y})={secondValue}] and Iterate (PlaceFinding + PreemptiveSet).");
+            
+            Iterate();
+            PrintCurrentSolution();
+        }
+
+        private Point ChooseFirstPointWithTwoPossibilities()
+        {
+            for (var x = 0; x < SUDOKU_SIZE; x++)
+            {
+                for (var y = 0; y < SUDOKU_SIZE; y++)
+                {
+                    if (_points[x,y].PossibleValuesAreOfSize(2))
+                    {
+                        return _points[x,y];
+                    }
+                }
+            }
+
+            return null;
         }
 
         private bool HasViolatedCondition()
@@ -281,21 +314,65 @@ namespace Sudoku.Core
 
         private bool GroupIsViolatingCondition(List<Point> pointGroup)
         {
+            foreach (var point in pointGroup)
+            {
+                if (point.IsSolved())
+                {
+                    var duplicateValue = pointGroup.Any(x=> !x.Equals(point) && x.Value == point.Value);
+                    if (duplicateValue)
+                    {
+                        Console.Out.WriteLine($"Duplicate value for Point({point.X},{point.Y})");
+                        return true;
+                    }
+                }
+                else
+                {
+                    var possibleValues = point.GetPossibleValues();
+                    if (possibleValues.Length == 0)
+                    {
+                        Console.Out.WriteLine($"No possible Candidate left for Point({point.X},{point.Y})");
+                        return true;
+                    }
+
+                    foreach (var possibleValue in possibleValues)
+                    {
+                        var duplicateValue = pointGroup.SkipWhile(x => x.Equals(point)).Any(x => x.Value == possibleValue);
+                        if (duplicateValue)
+                        {
+                            Console.Out.WriteLine($"Invalid Possible values for Point({point.X},{point.Y})");
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            /*
             var possibleValues = new List<int>(new []{1,2,3,4,5,6,7,8,9});
 
             foreach (var point in pointGroup)
             {
-                var value = point.Value;
+                if (point.IsSolved())
+                {
+                    var value = point.Value;
 
-                if (!possibleValues.Contains(value))
-                    return false;
+                    if (!possibleValues.Contains(value))
+                    {
+                        Console.Out.WriteLine($"Duplicate value for Point({point.X},{point.Y})");
+                        return true;
+                    }
 
-                possibleValues.Remove(value);
-
-                if (!point.IsSolved() && point.PossibleValuesAreOfSize(0))
-                    return false;
-            }
-            return true;
+                    possibleValues.Remove(value);
+                }
+                else
+                {
+                    if (point.PossibleValuesAreOfSize(0))
+                    {
+                        Console.Out.WriteLine($"No possible Candidate left for Point({point.X},{point.Y})");
+                        return true;
+                    }
+                }
+            }*/
+            return false;
         }
 
         private bool FindAndProcessTwoValuePreemptiveSet()
