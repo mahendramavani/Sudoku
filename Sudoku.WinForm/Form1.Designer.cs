@@ -48,10 +48,14 @@
             // 
             // textCell00
             // 
+            this.textCell00.Font = new System.Drawing.Font("Times New Roman", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textCell00.ForeColor = System.Drawing.Color.DarkCyan;
             this.textCell00.Location = new System.Drawing.Point(12, 29);
+            this.textCell00.MaxLength = 1;
             this.textCell00.Name = "textCell00";
-            this.textCell00.Size = new System.Drawing.Size(30, 20);
+            this.textCell00.Size = new System.Drawing.Size(50, 38);
             this.textCell00.TabIndex = 1;
+            this.textCell00.TextChanged += new System.EventHandler(this.textCell00_TextChanged);
             // 
             // textCell10
             // 
@@ -69,9 +73,12 @@
             // 
             // textCell30
             // 
+            this.textCell30.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.textCell30.Enabled = false;
             this.textCell30.Location = new System.Drawing.Point(138, 29);
+            this.textCell30.Multiline = true;
             this.textCell30.Name = "textCell30";
-            this.textCell30.Size = new System.Drawing.Size(30, 20);
+            this.textCell30.Size = new System.Drawing.Size(5, 400);
             this.textCell30.TabIndex = 4;
             // 
             // textBox5

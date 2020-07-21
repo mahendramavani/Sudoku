@@ -13,5 +13,10 @@ namespace Sudoku.WinForm
         {
 
         }
+
+        private void textCell00_TextChanged(object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

@@ -11,92 +11,148 @@ namespace Sudoku.CoreForm
         private Button btnSolve;
         private Button btnClear;
         private TextBox txtStatus;
+        private TextBox txtVerticalSeparator1;
+        private TextBox txtVerticalSeparator2;
+        private TextBox txtHorizontalSeparator1;
+        private TextBox txtHorizontalSeparator2;
         private TextBox[,] textCells;
         private Core.Sudoku _sudoku;
 
         public SudokuForm()
         {
             InitializeComponent();
-
-            var tabIndex = 1;
-
-            txtStatus = new TextBox();
-            btnSample1 = new Button();
-            btnSample2 = new Button();
-            btnSolve = new Button();
-            btnClear = new Button();
-            textCells = new TextBox[Core.Sudoku.SIZE, Core.Sudoku.SIZE];
+            
             SuspendLayout();
 
             components = new System.ComponentModel.Container();
-            AutoScaleMode = AutoScaleMode.Font;
-            
-            txtStatus.Location = new System.Drawing.Point(570, 0);
-            txtStatus.Multiline = true;
-            txtStatus.Name = "txtStatus";
-            txtStatus.Size = new Size(421, 500);
-            txtStatus.Enabled = false;
-            txtStatus.TabStop = false;
-            
-            for (var y = 0; y < Core.Sudoku.SIZE; y++)
-            {
-                for (var x = 0; x < Core.Sudoku.SIZE; x++)
-                {
-                    textCells[x, y] = new TextBox
-                    {
-                        Location = new System.Drawing.Point((x + 1) * 50, (y + 1) * 30),
-                        Name = "Cell" + x + y,
-                        Size = new Size(35, 20),
-                        TabIndex = tabIndex++,
-                    };
-
-                    Controls.Add(textCells[x,y]);
-                }
-            }
-
-            btnClear.Location = new System.Drawing.Point(150, 400);
-            btnClear.Name = "btnClear";
-            btnClear.Size = new Size(75, 23);
-            btnClear.TabIndex = tabIndex;
-            btnClear.Text = "Clear";
-            btnClear.UseVisualStyleBackColor = true;
-            btnClear.Click += btnClear_Click;
-
-            btnSample1.Location = new System.Drawing.Point(250, 400);
-            btnSample1.Name = "btnSample1";
-            btnSample1.Size = new Size(75, 23);
-            btnSample1.TabIndex = tabIndex;
-            btnSample1.Text = "Sample 1";
-            btnSample1.UseVisualStyleBackColor = true;
-            btnSample1.Click += btnSample1_Click;
-
-            btnSample2.Location = new System.Drawing.Point(350, 400);
-            btnSample2.Name = "btnSample2";
-            btnSample2.Size = new Size(75, 23);
-            btnSample2.TabIndex = tabIndex;
-            btnSample2.Text = "Sample 2";
-            btnSample2.UseVisualStyleBackColor = true;
-            btnSample2.Click += btnSample2_Click;
-
-            btnSolve.Location = new System.Drawing.Point(450, 400);
-            btnSolve.Name = "btnSolve";
-            btnSolve.Size = new Size(75, 23);
-            btnSolve.TabIndex = tabIndex;
-            btnSolve.Text = "Solve";
-            btnSolve.UseVisualStyleBackColor = true;
-            btnSolve.Click += btnSolve_Click;
-
             AutoScaleDimensions = new SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1000, 550);
             Name = "SudokuForm";
             Text = "Sudoku";
 
-            Controls.Add(btnSolve);
-            Controls.Add(btnClear);
-            Controls.Add(btnSample1);
-            Controls.Add(btnSample2);
+            txtStatus = new TextBox
+            {
+                Location = new System.Drawing.Point(570, 10),
+                Multiline = true,
+                Name = "txtStatus",
+                Size = new Size(420, 500),
+                Enabled = false,
+                TabStop = false
+            };
             Controls.Add(txtStatus);
+
+            txtVerticalSeparator1 = new TextBox
+            {
+                BackColor = SystemColors.InactiveCaptionText,
+                Enabled = false,
+                Multiline = true,
+                Name = "txtVerticalSeparator1",
+                Size = new Size(5, 450),
+                Location = new System.Drawing.Point(190, 40)
+            };
+            Controls.Add(txtVerticalSeparator1);
+            
+            txtVerticalSeparator2 = new TextBox
+            {
+                BackColor = SystemColors.InactiveCaptionText,
+                Enabled = false,
+                Multiline = true,
+                Name = "txtVerticalSeparator2",
+                Size = new Size(5, 450),
+                Location = new System.Drawing.Point(340, 40)
+            };
+            Controls.Add(txtVerticalSeparator2);
+            
+            txtHorizontalSeparator1 = new TextBox
+            {
+                BackColor = SystemColors.InactiveCaptionText,
+                Enabled = false,
+                Multiline = true,
+                Name = "txtHorizontalSeparator1",
+                Size = new Size(450, 5),
+                Location = new System.Drawing.Point(40, 190)
+            };
+            Controls.Add(txtHorizontalSeparator1);
+
+            txtHorizontalSeparator2 = new TextBox
+            {
+                BackColor = SystemColors.InactiveCaptionText,
+                Enabled = false,
+                Multiline = true,
+                Name = "txtHorizontalSeparator2",
+                Size = new Size(450, 5),
+                Location = new System.Drawing.Point(40, 340)
+            };
+            Controls.Add(txtHorizontalSeparator2);
+
+            var tabIndex = 1;
+            textCells = new TextBox[Core.Sudoku.SIZE, Core.Sudoku.SIZE];
+            for (var y = 0; y < Core.Sudoku.SIZE; y++)
+            {
+                for (var x = 0; x < Core.Sudoku.SIZE; x++)
+                {
+                    textCells[x, y] = new TextBox
+                    {
+                        Location = new System.Drawing.Point((x + 1) * 50, (y + 1) * 50),
+                        Name = "Cell" + x + y,
+                        Size = new Size(35, 30),
+                        TabIndex = tabIndex++,
+                        Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                        MaxLength = 1,
+                    };
+                    textCells[x,y].TextChanged += textCells_TextChanged;
+                    Controls.Add(textCells[x,y]);
+                }
+            }
+
+            btnClear = new Button
+            {
+                Location = new System.Drawing.Point(150, 500),
+                Name = "btnClear",
+                Size = new Size(75, 23),
+                TabIndex = tabIndex,
+                Text = "Clear",
+                UseVisualStyleBackColor = true
+            };
+            btnClear.Click += btnClear_Click;
+            Controls.Add(btnClear);
+
+            btnSample1 = new Button
+            {
+                Location = new System.Drawing.Point(250, 500),
+                Name = "btnSample1",
+                Size = new Size(75, 23),
+                TabIndex = tabIndex,
+                Text = "Sample 1",
+                UseVisualStyleBackColor = true
+            };
+            btnSample1.Click += btnSample1_Click;
+            Controls.Add(btnSample1);
+            
+            btnSample2 = new Button
+            {
+                Location = new System.Drawing.Point(350, 500),
+                Name = "btnSample2",
+                Size = new Size(75, 23),
+                TabIndex = tabIndex,
+                Text = "Sample 2",
+                UseVisualStyleBackColor = true
+            };
+            btnSample2.Click += btnSample2_Click;
+            Controls.Add(btnSample2);
+
+            btnSolve = new Button
+            {
+                Location = new System.Drawing.Point(450, 500),
+                Name = "btnSolve",
+                Size = new Size(75, 23),
+                TabIndex = tabIndex,
+                Text = "Solve",
+                UseVisualStyleBackColor = true
+            };
+            btnSolve.Click += btnSolve_Click;
+            Controls.Add(btnSolve);
             
             ResumeLayout(false);
             PerformLayout();
@@ -112,7 +168,7 @@ namespace Sudoku.CoreForm
 
                     if (value != 0)
                     {
-                        textCells[x, y].BackColor = Color.Green;
+                        textCells[x, y].BackColor = Color.LightGreen;
                         textCells[x, y].Text = value.ToString();
                     }
                     else
@@ -122,6 +178,12 @@ namespace Sudoku.CoreForm
                     }
                 }
             }
+        }
+
+
+        private void textCells_TextChanged(object sender, System.EventArgs e)
+        {
+            SendKeys.Send("\t");
         }
 
         private void btnClear_Click(object sender, System.EventArgs e)
@@ -134,6 +196,8 @@ namespace Sudoku.CoreForm
                     textCells[x,y].ResetBackColor();
                 }
             }
+
+            textCells[0, 0].Focus();
         }
 
         private void btnSample1_Click(object sender, System.EventArgs e)
