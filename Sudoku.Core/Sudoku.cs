@@ -59,6 +59,7 @@ namespace Sudoku.Core
 
         private void PlaceFinding()
         {
+            _view.AppendStatus("Taking a pass with PlaceFinding.");
             var anyPointReachedSolution = false;
             var anyPointInViolation = false;
 
@@ -147,6 +148,8 @@ namespace Sudoku.Core
 
         private void PreemptiveSet()
         {
+            _view.AppendStatus("Taking a pass with PreemptiveSet.");
+
             bool solvedAtLeastOne = false;
             var takeAnotherPass = true;
             while (takeAnotherPass)
@@ -166,12 +169,14 @@ namespace Sudoku.Core
 
         private void TryWithPotentialCandidate()
         {
-            if (_iterationCountForCandidateChecking++ > 10)
+            if (_iterationCountForCandidateChecking++ > 100)
             {
                 _view.AppendStatus($"Completed {_iterationCountForCandidateChecking} iteration of CandidateFinding but still No solution is reached.");
                 return;
             }
 
+            _view.AppendStatus("------------------------------------------------");
+            _view.AppendStatus($"Round {_iterationCountForCandidateChecking} of PotentialCandidate.");
             _view.Print(_points);
             
             if (IsSolutionReached())
@@ -220,6 +225,7 @@ namespace Sudoku.Core
                     }
                     else
                     {
+                        selectedPoint.FinalizeGuessedValue();
                         _view.AppendStatus($"All good so far. First value is the right choice");
                     }
                 }

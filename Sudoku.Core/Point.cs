@@ -166,6 +166,11 @@ namespace Sudoku.Core
             };
             return point;
         }
+
+        public void FinalizeGuessedValue()
+        {
+            Type=ValueType.Calculated;
+        }
     }
 
     public enum ValueType

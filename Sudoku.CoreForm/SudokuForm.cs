@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 using Sudoku.Core;
 
@@ -27,18 +28,21 @@ namespace Sudoku.CoreForm
             components = new System.ComponentModel.Container();
             AutoScaleDimensions = new SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 550);
+            ClientSize = new Size(1500, 900);
             Name = "SudokuForm";
             Text = "Sudoku";
+            WindowState = FormWindowState.Maximized;
 
             txtStatus = new TextBox
             {
-                Location = new System.Drawing.Point(570, 10),
+                Location = new System.Drawing.Point(1100, 10),
                 Multiline = true,
+                Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
                 Name = "txtStatus",
-                Size = new Size(420, 500),
-                Enabled = false,
-                TabStop = false
+                Size = new Size(500, 700),
+                Enabled = true,
+                TabStop = false,
+                ScrollBars = ScrollBars.Vertical,
             };
             Controls.Add(txtStatus);
 
@@ -48,8 +52,8 @@ namespace Sudoku.CoreForm
                 Enabled = false,
                 Multiline = true,
                 Name = "txtVerticalSeparator1",
-                Size = new Size(5, 450),
-                Location = new System.Drawing.Point(190, 40)
+                Size = new Size(10, 700),
+                Location = new System.Drawing.Point(335, 0)
             };
             Controls.Add(txtVerticalSeparator1);
             
@@ -59,8 +63,8 @@ namespace Sudoku.CoreForm
                 Enabled = false,
                 Multiline = true,
                 Name = "txtVerticalSeparator2",
-                Size = new Size(5, 450),
-                Location = new System.Drawing.Point(340, 40)
+                Size = new Size(10, 700),
+                Location = new System.Drawing.Point(635, 0)
             };
             Controls.Add(txtVerticalSeparator2);
             
@@ -70,8 +74,8 @@ namespace Sudoku.CoreForm
                 Enabled = false,
                 Multiline = true,
                 Name = "txtHorizontalSeparator1",
-                Size = new Size(450, 5),
-                Location = new System.Drawing.Point(40, 190)
+                Size = new Size(890, 10),
+                Location = new System.Drawing.Point(45, 225)
             };
             Controls.Add(txtHorizontalSeparator1);
 
@@ -81,8 +85,8 @@ namespace Sudoku.CoreForm
                 Enabled = false,
                 Multiline = true,
                 Name = "txtHorizontalSeparator2",
-                Size = new Size(450, 5),
-                Location = new System.Drawing.Point(40, 340)
+                Size = new Size(890, 10),
+                Location = new System.Drawing.Point(45, 465)
             };
             Controls.Add(txtHorizontalSeparator2);
 
@@ -94,11 +98,11 @@ namespace Sudoku.CoreForm
                 {
                     textCells[x, y] = new TextBox
                     {
-                        Location = new System.Drawing.Point((x + 1) * 50, (y + 1) * 50),
+                        Location = new System.Drawing.Point(50+ x*100, y*80),
                         Name = "Cell" + x + y,
-                        Size = new Size(35, 30),
+                        Size = new Size(80, 60),
                         TabIndex = tabIndex++,
-                        Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                        Font = new Font("Times New Roman", 40F, FontStyle.Bold, GraphicsUnit.Point, 0),
                         MaxLength = 1,
                     };
                     textCells[x,y].TextChanged += textCells_TextChanged;
@@ -106,13 +110,28 @@ namespace Sudoku.CoreForm
                 }
             }
 
+            btnSolve = new Button
+            {
+                Location = new System.Drawing.Point(950, 50),
+                Name = "btnSolve",
+                Size = new Size(130, 80),
+                Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
+                TabIndex = tabIndex,
+                Text = "&Solve",
+                UseVisualStyleBackColor = true
+            };
+            btnSolve.Click += btnSolve_Click;
+            Controls.Add(btnSolve);
+
+
             btnClear = new Button
             {
-                Location = new System.Drawing.Point(150, 500),
+                Location = new System.Drawing.Point(950, 150),
                 Name = "btnClear",
-                Size = new Size(75, 23),
+                Size = new Size(130, 80),
+                Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
                 TabIndex = tabIndex,
-                Text = "Clear",
+                Text = "&Clear",
                 UseVisualStyleBackColor = true
             };
             btnClear.Click += btnClear_Click;
@@ -120,11 +139,12 @@ namespace Sudoku.CoreForm
 
             btnSample1 = new Button
             {
-                Location = new System.Drawing.Point(250, 500),
+                Location = new System.Drawing.Point(950, 250),
                 Name = "btnSample1",
-                Size = new Size(75, 23),
+                Size = new Size(130, 80),
+                Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
                 TabIndex = tabIndex,
-                Text = "Sample 1",
+                Text = "Sample &1",
                 UseVisualStyleBackColor = true
             };
             btnSample1.Click += btnSample1_Click;
@@ -132,27 +152,16 @@ namespace Sudoku.CoreForm
             
             btnSample2 = new Button
             {
-                Location = new System.Drawing.Point(350, 500),
+                Location = new System.Drawing.Point(950, 350),
                 Name = "btnSample2",
-                Size = new Size(75, 23),
+                Size = new Size(130, 80),
+                Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0),
                 TabIndex = tabIndex,
-                Text = "Sample 2",
+                Text = "Sample &2",
                 UseVisualStyleBackColor = true
             };
             btnSample2.Click += btnSample2_Click;
             Controls.Add(btnSample2);
-
-            btnSolve = new Button
-            {
-                Location = new System.Drawing.Point(450, 500),
-                Name = "btnSolve",
-                Size = new Size(75, 23),
-                TabIndex = tabIndex,
-                Text = "Solve",
-                UseVisualStyleBackColor = true
-            };
-            btnSolve.Click += btnSolve_Click;
-            Controls.Add(btnSolve);
             
             ResumeLayout(false);
             PerformLayout();
@@ -183,7 +192,18 @@ namespace Sudoku.CoreForm
 
         private void textCells_TextChanged(object sender, System.EventArgs e)
         {
-            SendKeys.Send("\t");
+            var textBox = (TextBox)sender;
+            var value = textBox.Text.Trim();
+
+            if (int.TryParse(value, out _))
+            {
+                SendKeys.Send("\t");
+            }
+            else if (value.Length != 0)
+            {
+                textBox.Text = string.Empty;
+                textBox.Focus();
+            }
         }
 
         private void btnClear_Click(object sender, System.EventArgs e)
@@ -197,6 +217,7 @@ namespace Sudoku.CoreForm
                 }
             }
 
+            txtStatus.Text = string.Empty;
             textCells[0, 0].Focus();
         }
 
@@ -285,7 +306,7 @@ namespace Sudoku.CoreForm
 
         public void AppendStatus(string status)
         {
-            txtStatus.Text += "\r\n==>" + status;
+            txtStatus.Text += "\r\n=>" + status;
         }
 
         public void Print(Core.Point[,] points)
