@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sudoku.Core", "Sudoku.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku.WinForm", "Sudoku.WinForm\Sudoku.WinForm.csproj", "{FA2723CF-2796-4A75-ABD4-571A5EB3BD1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku.CoreForm", "Sudoku.CoreForm\Sudoku.CoreForm.csproj", "{EC142378-64B3-42BC-8EE6-B1782F1870D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sudoku.CoreForm", "Sudoku.CoreForm\Sudoku.CoreForm.csproj", "{EC142378-64B3-42BC-8EE6-B1782F1870D4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kakuro.Core", "Kakuro.Core\Kakuro.Core.csproj", "{00E41F40-77B0-468E-857C-515D9A143038}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kakuro.CoreForm", "Kakuro.CoreForm\Kakuro.CoreForm.csproj", "{875A7EC1-1ACA-4713-92AE-0C66B2AD1D7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{EC142378-64B3-42BC-8EE6-B1782F1870D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC142378-64B3-42BC-8EE6-B1782F1870D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC142378-64B3-42BC-8EE6-B1782F1870D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00E41F40-77B0-468E-857C-515D9A143038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00E41F40-77B0-468E-857C-515D9A143038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00E41F40-77B0-468E-857C-515D9A143038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00E41F40-77B0-468E-857C-515D9A143038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{875A7EC1-1ACA-4713-92AE-0C66B2AD1D7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{875A7EC1-1ACA-4713-92AE-0C66B2AD1D7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{875A7EC1-1ACA-4713-92AE-0C66B2AD1D7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{875A7EC1-1ACA-4713-92AE-0C66B2AD1D7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
