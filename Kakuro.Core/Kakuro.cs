@@ -37,9 +37,10 @@ namespace Kakuro.Core
             _view.DisplayCurrentStatus(_cells);
 
             FindParts();
+            CalculateEliminatedValueSet();
+            CalculateLastNumberOfSet();    
+
             _view.DisplayCurrentStatus(_cells);
-            
-            //CalculateEliminatedValueSet();
         }
 
         private void FindParts()
@@ -60,21 +61,14 @@ namespace Kakuro.Core
                         }
 
                         _cells[x, y].SumXParts = numberOfParts;
-
-                        var key = numberOfParts + "_" + _cells[x, y].SumX;
-                        var neverUsed = _numberSet[key].NeverUsed;
-
-                        for (var i = x + 1; i < _xSize; i++)
-                        {
-                            if (_cells[i, y].IsGameCell())
-                                _cells[i,y].EliminateNumber(neverUsed.ToArray());
-                            else
-                                break;
-                        }
                     }
 
                     if (_cells[x, y].IsSumYCell)
                     {
+                        if (y == 1 && x == 4)
+                        {
+                            var stop = true;
+                        }
                         var numberOfParts = 0;
                         for (var i = y + 1; i < _ySize; i++)
                         {
@@ -85,8 +79,34 @@ namespace Kakuro.Core
                         }
 
                         _cells[x, y].SumYParts = numberOfParts;
-                        
-                        var key = numberOfParts + "_" + _cells[x, y].SumY;
+                    }
+                }
+            }
+        }
+
+        private void CalculateEliminatedValueSet()
+        {
+            for (var y = 0; y < _ySize; y++)
+            {
+                for (var x = 0; x < _xSize; x++)
+                {
+                    if (_cells[x, y].IsSumXCell)
+                    {
+                        var key = string.Format(NumberSet.KEY_FORMAT, _cells[x,y].SumXParts, _cells[x, y].SumX);
+                        var neverUsed = _numberSet[key].NeverUsed;
+
+                        for (var i = x + 1; i < _xSize; i++)
+                        {
+                            if (_cells[i, y].IsGameCell())
+                                _cells[i, y].EliminateNumber(neverUsed.ToArray());
+                            else
+                                break;
+                        }
+                    }
+
+                    if (_cells[x, y].IsSumYCell)
+                    {
+                        var key = string.Format(NumberSet.KEY_FORMAT, _cells[x, y].SumYParts, _cells[x, y].SumY);
                         var neverUsed = _numberSet[key].NeverUsed;
 
                         for (var i = y + 1; i < _ySize; i++)
@@ -101,14 +121,69 @@ namespace Kakuro.Core
             }
         }
 
-        private void CalculateEliminatedValueSet()
+        private void CalculateLastNumberOfSet()
         {
             for (var y = 0; y < _ySize; y++)
             {
                 for (var x = 0; x < _xSize; x++)
                 {
+                    if (_cells[x, y].IsSumXCell)
+                    {
+                        var sum = _cells[x, y].SumX;
+                        var unSolvedCells = new List<Cell>();
+                        for (var i = x + 1; i < _xSize; i++)
+                        {
+                            if (_cells[i, y].IsGameCell())
+                            {
+                                if (_cells[i, y].IsSolved)
+                                {
+                                    sum -= _cells[i, y].Value;
+                                }
+                                else
+                                {
+                                    unSolvedCells.Add(_cells[i,y]);
+                                }
+                            }
+                            else
+                                break;
+                        }
+
+                        if (unSolvedCells.Count == 1)
+                        {
+                            unSolvedCells[0].MarkAsSolved(sum);
+                        }
+                    }
+
+                    if (_cells[x, y].IsSumYCell)
+                    {
+                        var sum = _cells[x, y].SumY;
+                        var unSolvedCells = new List<Cell>();
+
+                        for (var i = y + 1; i < _ySize; i++)
+                        {
+                            if (_cells[x, i].IsGameCell())
+                            {
+                                if (_cells[x, i].IsSolved)
+                                {
+                                    sum -= _cells[x, i].Value;
+                                }
+                                else
+                                {
+                                    unSolvedCells.Add(_cells[x, i]);
+                                }
+                            }
+                            else
+                                break;
+                        }
+
+                        if (unSolvedCells.Count == 1)
+                        {
+                            unSolvedCells[0].MarkAsSolved(sum);
+                        }
+                    }
                 }
             }
+
         }
     }
 }

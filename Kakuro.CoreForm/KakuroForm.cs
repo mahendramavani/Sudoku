@@ -27,8 +27,8 @@ namespace Kakuro.CoreForm
 
         private void HardCodedInputs()
         {
-            _txtXSize.Text = "3";
-            _txtYSize.Text = "3";
+            _txtXSize.Text = "8";
+            _txtYSize.Text = "10";
             btnDraw_Click(_btnDraw,EventArgs.Empty);
         }
 
@@ -157,20 +157,99 @@ namespace Kakuro.CoreForm
         private void HardCodedKakuroInputs()
         {
             _txtBoxes[0, 0].Text = @"x";
-            _txtBoxes[1, 0].Text = @"16\";
-            _txtBoxes[2, 0].Text = @"9\";
+            _txtBoxes[1, 0].Text = @"x";
+            _txtBoxes[2, 0].Text = @"x";
+            _txtBoxes[3, 0].Text = @"x";
+            _txtBoxes[4, 0].Text = @"x";
+            _txtBoxes[5, 0].Text = @"16\";
+            _txtBoxes[6, 0].Text = @"11\";
+            _txtBoxes[7, 0].Text = @"x";
 
-            _txtBoxes[0, 1].Text = @"\17";
-            _txtBoxes[1, 1].Text = @"";
-            _txtBoxes[2, 1].Text = @"";
+            _txtBoxes[0, 1].Text = @"x";
+            _txtBoxes[1, 1].Text = @"10\";
+            _txtBoxes[2, 1].Text = @"6\";
+            _txtBoxes[3, 1].Text = @"x";
+            _txtBoxes[4, 1].Text = @"41\9";
+            _txtBoxes[5, 1].Text = @"";
+            _txtBoxes[6, 1].Text = @"";
+            _txtBoxes[7, 1].Text = @"24\";
 
-            _txtBoxes[0, 2].Text = @"\8";
+            _txtBoxes[0, 2].Text = @"\12";
             _txtBoxes[1, 2].Text = @"";
             _txtBoxes[2, 2].Text = @"";
+            _txtBoxes[3, 2].Text = @"15\29";
+            _txtBoxes[4, 2].Text = @"";
+            _txtBoxes[5, 2].Text = @"";
+            _txtBoxes[6, 2].Text = @"";
+            _txtBoxes[7, 2].Text = @"";
+
+            _txtBoxes[0, 3].Text = @"\10";
+            _txtBoxes[1, 3].Text = @"";
+            _txtBoxes[2, 3].Text = @"";
+            _txtBoxes[3, 3].Text = @"";
+            _txtBoxes[4, 3].Text = @"";
+            _txtBoxes[5, 3].Text = @"\11";
+            _txtBoxes[6, 3].Text = @"";
+            _txtBoxes[7, 3].Text = @"";
+
+            _txtBoxes[0, 4].Text = @"x";
+            _txtBoxes[1, 4].Text = @"\10";
+            _txtBoxes[2, 4].Text = @"";
+            _txtBoxes[3, 4].Text = @"";
+            _txtBoxes[4, 4].Text = @"";
+            _txtBoxes[5, 4].Text = @"16\10";
+            _txtBoxes[6, 4].Text = @"";
+            _txtBoxes[7, 4].Text = @"";
+
+            _txtBoxes[0, 5].Text = @"x";
+            _txtBoxes[1, 5].Text = @"15\";
+            _txtBoxes[2, 5].Text = @"29\24";
+            _txtBoxes[3, 5].Text = @"";
+            _txtBoxes[4, 5].Text = @"";
+            _txtBoxes[5, 5].Text = @"";
+            _txtBoxes[6, 5].Text = @"23\";
+            _txtBoxes[7, 5].Text = @"x";
+
+            _txtBoxes[0, 6].Text = @"\6";
+            _txtBoxes[1, 6].Text = @"";
+            _txtBoxes[2, 6].Text = @"";
+            _txtBoxes[3, 6].Text = @"\16";
+            _txtBoxes[4, 6].Text = @"";
+            _txtBoxes[5, 6].Text = @"";
+            _txtBoxes[6, 6].Text = @"";
+            _txtBoxes[7, 6].Text = @"3\";
+
+            _txtBoxes[0, 7].Text = @"\17";
+            _txtBoxes[1, 7].Text = @"";
+            _txtBoxes[2, 7].Text = @"";
+            _txtBoxes[3, 7].Text = @"17\18";
+            _txtBoxes[4, 7].Text = @"";
+            _txtBoxes[5, 7].Text = @"";
+            _txtBoxes[6, 7].Text = @"";
+            _txtBoxes[7, 7].Text = @"";
+
+            _txtBoxes[0, 8].Text = @"\29";
+            _txtBoxes[1, 8].Text = @"";
+            _txtBoxes[2, 8].Text = @"";
+            _txtBoxes[3, 8].Text = @"";
+            _txtBoxes[4, 8].Text = @"";
+            _txtBoxes[5, 8].Text = @"\9";
+            _txtBoxes[6, 8].Text = @"";
+            _txtBoxes[7, 8].Text = @"";
+
+            _txtBoxes[0, 9].Text = @"x";
+            _txtBoxes[1, 9].Text = @"\16";
+            _txtBoxes[2, 9].Text = @"";
+            _txtBoxes[3, 9].Text = @"";
+            _txtBoxes[4, 9].Text = @"x";
+            _txtBoxes[5, 9].Text = @"x";
+            _txtBoxes[6, 9].Text = @"x";
+            _txtBoxes[7, 9].Text = @"x";
         }
 
         private void btnSolve_Click(object sender, EventArgs e)
         {
+            _btnSolve.Enabled = false;
             var kakuroBoard = new KakuroBoard(this,_xSize, _ySize);
             kakuroBoard.Solve();
         }
