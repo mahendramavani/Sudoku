@@ -25,13 +25,19 @@ namespace Kakuro.Core
                     _eliminatedValues.Add(number);
                 }
             }
+        }
 
+        public bool CanSolveIfAllButOneAreEliminated(out int solvedValue)
+        {
+            solvedValue = 0;
             var allValue = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             if (_eliminatedValues.Count == 8)
             {
                 var value = allValue.Except(_eliminatedValues).ElementAt(0);
                 MarkAsSolved(value);
+                solvedValue = value;
             }
+            return false;
         }
 
         public void MarkAsSolved(int value)

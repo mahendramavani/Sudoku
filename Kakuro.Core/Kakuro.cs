@@ -24,8 +24,16 @@ namespace Kakuro.Core
         public void Solve()
         {
             BuildKakuroBoardFromUserInput();
-            CalculateEliminatedValueSet();
-            CalculateLastNumberOfSet();    
+            _view.DisplayCurrentStatus(_sumCells);
+
+            while (true)
+            {
+                var anythingSolved1 = CalculateEliminatedValueSet();
+                var anythingSolved2 = CalculateLastNumberOfSet();
+
+                if (!anythingSolved1 && !anythingSolved2)
+                    break;
+            } 
 
             _view.DisplayCurrentStatus(_sumCells);
         }
@@ -87,47 +95,67 @@ namespace Kakuro.Core
             }
         }
 
-        private void CalculateEliminatedValueSet()
+        private bool CalculateEliminatedValueSet()
         {
+            var anythingSolved = false;
+
             _sumCells.ForEach(sumCell =>
             {
                 if (sumCell.HasSumX)
                 {
-                    EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyX, sumCell.GetXPartCells(), Direction.Horizontal);
+                    anythingSolved  = EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyX, sumCell.GetXPartCells(), Direction.Horizontal) || anythingSolved;
                 }
                 if (sumCell.HasSumY)
                 {
-                    EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyY, sumCell.GetYPartCells(), Direction.Vertical);
+                    anythingSolved = EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyY, sumCell.GetYPartCells(), Direction.Vertical) || anythingSolved;
                 }
             });
+
+            return anythingSolved;
         }
 
-        private static void EliminateNeverUsedNumbers(SumCell sumCell, string lookupKey, GameCell[] partCells, Direction direction)
+        private bool EliminateNeverUsedNumbers(SumCell sumCell, string lookupKey, GameCell[] partCells, Direction direction)
         {
+            var anythingSolved = false;
             var neverUsed = NumberSets[lookupKey].NeverUsed;
-
             foreach (var gameCell in partCells)
             {
                 if (gameCell.IsSolved)
                     sumCell.AddAlreadySolved(gameCell.Value, direction);
                 else
+                {
                     gameCell.EliminateTheNumbers(neverUsed.ToArray());
+                    if (gameCell.CanSolveIfAllButOneAreEliminated(out var solvedValue))
+                    {
+                        sumCell.AddAlreadySolved(solvedValue, direction);
+                        anythingSolved = true;
+                    }
+                }
             }
+            return anythingSolved;
         }
 
-        private void CalculateLastNumberOfSet()
+        private bool CalculateLastNumberOfSet()
         {
+            var anythingSolved = false;
+
             _sumCells.ForEach(sumCell =>
             {
                 if (sumCell.HasSumX)
-                    CheckForLastMissingPart(sumCell,sumCell.SumX, sumCell.GetXPartCells(), Direction.Horizontal);
-                
+                {
+                    anythingSolved = CheckForLastMissingPart(sumCell,sumCell.SumX, sumCell.GetXPartCells(), Direction.Horizontal) || anythingSolved;
+                }
+
                 if (sumCell.HasSumY)
-                    CheckForLastMissingPart(sumCell,sumCell.SumY, sumCell.GetYPartCells(), Direction.Vertical);
+                {
+                    anythingSolved = CheckForLastMissingPart(sumCell,sumCell.SumY, sumCell.GetYPartCells(), Direction.Vertical) || anythingSolved;
+                }
             });
+
+            return anythingSolved;
         }
 
-        private void CheckForLastMissingPart(SumCell sumCell, int sum, GameCell[] parts, Direction direction)
+        private bool CheckForLastMissingPart(SumCell sumCell, int sum, GameCell[] parts, Direction direction)
         {
             var unSolvedCells = new List<GameCell>();
             foreach (var gameCell in parts)
@@ -147,7 +175,10 @@ namespace Kakuro.Core
             if (unSolvedCells.Count == 1)
             {
                 unSolvedCells[0].MarkAsSolved(sum);
+                return true;
             }
+
+            return false;
         }
     }
 }
