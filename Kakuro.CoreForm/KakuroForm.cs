@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Kakuro.Core;
@@ -273,43 +274,40 @@ namespace Kakuro.CoreForm
             }
         }
 
-        public void DisplayCurrentStatus(Cell[,] cells)
+        public void DisplayCurrentStatus(IList<SumCell> sumCells)
         {
-            for (var y = 0; y < _ySize; y++)
+            foreach (var sumCell in sumCells)
             {
-                for (var x = 0; x < _xSize; x++)
+                var sumTextBox = _txtBoxes[sumCell.XPosition,sumCell.YPosition];
+
+                sumTextBox.BackColor = Color.DarkGray;
+                sumTextBox.Font = new Font("Times New Roman", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
+                sumTextBox.Enabled = false;
+                sumTextBox.Text = sumCell.GetDisplayValue();
+
+                foreach (var gameCell in sumCell.GetXPartCells())
                 {
-                    DisplayCurrentStatus(cells[x,y],_txtBoxes[x,y]);
+                    var gameTextBox = _txtBoxes[gameCell.XPosition, gameCell.YPosition];
+
+                    if (gameCell.IsSolved)
+                    {
+                        gameTextBox.Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0);
+                        gameTextBox.Text = gameCell.DisplaySolutionValue();
+                    }
+                    else
+                    {
+                        gameTextBox.Font = new Font("Times New Roman", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
+                        gameTextBox.MaxLength = 15;
+                        gameTextBox.Text = gameCell.GetEliminationValueDisplayValue();
+                    }
                 }
             }
         }
-
-        private void DisplayCurrentStatus(Cell cell, TextBox textBox)
+        public void RemoveCell(Cell cell)
         {
-            if (cell.IsRemoved)
-            {
-                Controls.Remove(textBox);
-            }
-            else if (cell.IsSumCell())
-            {
-                textBox.BackColor = Color.DarkGray;
-                textBox.Font = new Font("Times New Roman", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
-                textBox.Enabled = false;
-                textBox.Text = cell.DisplaySumCellValue();
-            }
-            else if (cell.IsSolved)
-            {
-                textBox.Font = new Font("Times New Roman", 20F, FontStyle.Bold, GraphicsUnit.Point, 0);
-                textBox.Text = cell.DisplaySolutionValue();
-            }
-            else if (cell.IsGameCell())
-            {
-                textBox.Font = new Font("Times New Roman", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
-                textBox.MaxLength = 15;
-                textBox.Text = cell.DisplayEliminationValue();
-            }
+            Controls.Remove(_txtBoxes[cell.XPosition,cell.YPosition]);
         }
-        
+
         private void btnClear_Click(object sender, EventArgs e)
         {
             for (var y = 0; y < _ySize; y++)

@@ -6,13 +6,18 @@ namespace Kakuro.Core.Domain
 {
     public class NumberSet : IEquatable<NumberSet>, IComparer<NumberSet>
     {
-        public const string KEY_FORMAT = "{0}_{1}"; 
+        private const string KEY_FORMAT = "{0}_{1}"; 
         public int NumberOfCells { get; set; }
         public int Sum { get; set; }
         public List<List<int>> Sets { get; set; }
         public List<int> AlwaysUsed { get; set; }
         public List<int> NeverUsed { get; set; }
-        public string Key => string.Format(KEY_FORMAT,NumberOfCells,Sum);
+        public string Key => KeyFrom(NumberOfCells, Sum);
+
+        public static string KeyFrom(int numberOfParts, int sum)
+        {
+            return string.Format(KEY_FORMAT, numberOfParts, sum);
+        }
 
         public bool Equals(NumberSet other)
         {
