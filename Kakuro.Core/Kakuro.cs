@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kakuro.Core.Domain;
 
 namespace Kakuro.Core
@@ -29,13 +30,15 @@ namespace Kakuro.Core
             while (true)
             {
                 var anythingSolved1 = CalculateEliminatedValueSet();
-                var anythingSolved2 = CalculateLastNumberOfSet();
+                _view.DisplayCurrentStatus(_sumCells);
 
+                var anythingSolved2 = CalculateLastNumberOfSet();
+                _view.DisplayCurrentStatus(_sumCells);
                 if (!anythingSolved1 && !anythingSolved2)
                     break;
             } 
 
-            _view.DisplayCurrentStatus(_sumCells);
+            //_view.DisplayCurrentStatus(_sumCells);
         }
 
         private void BuildKakuroBoardFromUserInput()
@@ -103,11 +106,13 @@ namespace Kakuro.Core
             {
                 if (sumCell.HasSumX)
                 {
-                    anythingSolved  = EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyX, sumCell.GetXPartCells(), Direction.Horizontal) || anythingSolved;
+                    if (EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyX, sumCell.GetXPartCells(), Direction.Horizontal))
+                        anythingSolved = true;
                 }
                 if (sumCell.HasSumY)
                 {
-                    anythingSolved = EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyY, sumCell.GetYPartCells(), Direction.Vertical) || anythingSolved;
+                    if (EliminateNeverUsedNumbers(sumCell, sumCell.LookupKeyY, sumCell.GetYPartCells(), Direction.Vertical))
+                        anythingSolved = true;
                 }
             });
 
@@ -116,20 +121,21 @@ namespace Kakuro.Core
 
         private bool EliminateNeverUsedNumbers(SumCell sumCell, string lookupKey, GameCell[] partCells, Direction direction)
         {
-            var anythingSolved = false;
-            var neverUsed = NumberSets[lookupKey].NeverUsed;
-            foreach (var gameCell in partCells)
+            foreach (var gameCell in partCells.Where(x => x.IsSolved))
             {
-                if (gameCell.IsSolved)
-                    sumCell.AddAlreadySolved(gameCell.Value, direction);
-                else
+                sumCell.AddAlreadySolved(gameCell.Value, direction);
+            }
+
+            var neverUsed = NumberSets[lookupKey].NeverUsed;
+            var alreadySolved = sumCell.GetAlreadySolved(direction);
+            var eliminationList = neverUsed.Union(alreadySolved);
+
+            var anythingSolved = false;
+            foreach (var gameCell in partCells.Where(x=>!x.IsSolved))
+            {
+                if (gameCell.EliminateTheNumbers(eliminationList.ToArray()))
                 {
-                    gameCell.EliminateTheNumbers(neverUsed.ToArray());
-                    if (gameCell.CanSolveIfAllButOneAreEliminated(out var solvedValue))
-                    {
-                        sumCell.AddAlreadySolved(solvedValue, direction);
-                        anythingSolved = true;
-                    }
+                    anythingSolved = true;
                 }
             }
             return anythingSolved;
@@ -143,12 +149,14 @@ namespace Kakuro.Core
             {
                 if (sumCell.HasSumX)
                 {
-                    anythingSolved = CheckForLastMissingPart(sumCell,sumCell.SumX, sumCell.GetXPartCells(), Direction.Horizontal) || anythingSolved;
+                    if (CheckForLastMissingPart(sumCell,sumCell.SumX, sumCell.GetXPartCells(), Direction.Horizontal))
+                        anythingSolved = true;
                 }
 
                 if (sumCell.HasSumY)
                 {
-                    anythingSolved = CheckForLastMissingPart(sumCell,sumCell.SumY, sumCell.GetYPartCells(), Direction.Vertical) || anythingSolved;
+                    if (CheckForLastMissingPart(sumCell,sumCell.SumY, sumCell.GetYPartCells(), Direction.Vertical))
+                        anythingSolved = true;
                 }
             });
 
@@ -157,6 +165,8 @@ namespace Kakuro.Core
 
         private bool CheckForLastMissingPart(SumCell sumCell, int sum, GameCell[] parts, Direction direction)
         {
+            var anythingSolved = false;
+
             var unSolvedCells = new List<GameCell>();
             foreach (var gameCell in parts)
             {
@@ -172,13 +182,24 @@ namespace Kakuro.Core
                 }
             }
 
-            if (unSolvedCells.Count == 1)
+            var unSolvedCount = unSolvedCells.Count;
+            if (unSolvedCount == 1)
             {
                 unSolvedCells[0].MarkAsSolved(sum);
-                return true;
+                anythingSolved = true;
+            }
+            else if (unSolvedCount > 1)
+            {
+                //Work on the remaining (unsolved subset) and see if anymore possibilities can be eliminated
+                var neverUsed = NumberSets[NumberSet.KeyFrom(unSolvedCount, sum)].NeverUsed;
+                foreach (var unSolvedCell in unSolvedCells)
+                {
+                    if (unSolvedCell.EliminateTheNumbers(neverUsed.ToArray()))
+                        anythingSolved = true;
+                }
             }
 
-            return false;
+            return anythingSolved;
         }
     }
 }

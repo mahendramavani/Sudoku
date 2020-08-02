@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Kakuro.Core.Domain;
 
 namespace Kakuro.Core
 {
@@ -7,7 +8,7 @@ namespace Kakuro.Core
     {
         private readonly List<int> _eliminatedValues = new List<int>();
         
-        public int Value { get; set; }
+        public int Value { get; private set; }
         public bool IsSolved { get; set; }
         public SumCell XSumCell { get; set; }
         public SumCell YSumCell { get; set; }
@@ -16,8 +17,10 @@ namespace Kakuro.Core
         {
         }
 
-        public void EliminateTheNumbers(params int[] numbers)
+        public bool EliminateTheNumbers(params int[] numbers)
         {
+            var anythingSolved = false;
+
             foreach (var number in numbers)
             {
                 if (number > 0 && number < 10 && !_eliminatedValues.Contains(number))
@@ -25,25 +28,34 @@ namespace Kakuro.Core
                     _eliminatedValues.Add(number);
                 }
             }
+
+            if (CanBeSolvedWithLastNonEliminatedValue(out var solvedValue))
+            {
+                MarkAsSolved(solvedValue);
+                anythingSolved = true;
+            }
+
+            return anythingSolved;
         }
 
-        public bool CanSolveIfAllButOneAreEliminated(out int solvedValue)
+        private bool CanBeSolvedWithLastNonEliminatedValue(out int solvedValue)
         {
             solvedValue = 0;
+            if (_eliminatedValues.Count != 8) 
+                return false;
+            
             var allValue = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-            if (_eliminatedValues.Count == 8)
-            {
-                var value = allValue.Except(_eliminatedValues).ElementAt(0);
-                MarkAsSolved(value);
-                solvedValue = value;
-            }
-            return false;
+            solvedValue = allValue.Except(_eliminatedValues).ElementAt(0);
+            return true;
         }
 
         public void MarkAsSolved(int value)
         {
             Value = value;
             IsSolved = true;
+
+            XSumCell.FoundNewSolution(value, Direction.Horizontal);
+            YSumCell.FoundNewSolution(value, Direction.Vertical);
         }
 
         public string DisplaySolutionValue()

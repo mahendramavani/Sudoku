@@ -42,6 +42,11 @@ namespace Kakuro.Core
             }
         }
 
+        public List<int> GetAlreadySolved(Direction direction)
+        {
+            return (direction==Direction.Horizontal) ?_alreadySolvedX : (direction==Direction.Vertical ?_alreadySolvedY : new List<int>());
+        }
+
         public void AddPartGameCell(GameCell gameCell, Direction direction)
         {
             if (direction == Direction.Horizontal)
@@ -71,6 +76,28 @@ namespace Kakuro.Core
             return @"   \" + (HasSumX ? SumX.ToString() : string.Empty).PadLeft(3)
                            + "\r\n"
                            + (HasSumY ? SumY.ToString() : string.Empty).PadRight(3) + @"\";
+        }
+
+        public void FoundNewSolution(int solvedValue, Direction direction)
+        {
+            AddAlreadySolved(solvedValue, direction);
+            if (direction == Direction.Horizontal)
+            {
+                EliminateNewlyFoundSolutionFromRestOfTheGroupCell(_partsXCells, solvedValue);
+            }
+            else if (direction == Direction.Vertical)
+            {
+                EliminateNewlyFoundSolutionFromRestOfTheGroupCell(_partsYCells, solvedValue);
+            }
+        }
+
+        private void EliminateNewlyFoundSolutionFromRestOfTheGroupCell(List<GameCell> partsXCells, int value)
+        {
+            partsXCells.ForEach(gameCell =>
+            {
+                if (!gameCell.IsSolved)
+                    gameCell.EliminateTheNumbers(new[] {value});
+            });
         }
     }
 }
