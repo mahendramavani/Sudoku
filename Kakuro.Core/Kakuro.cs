@@ -165,8 +165,6 @@ namespace Kakuro.Core
 
         private bool CheckForLastMissingPart(SumCell sumCell, int sum, GameCell[] parts, Direction direction)
         {
-            var anythingSolved = false;
-
             var unSolvedCells = new List<GameCell>();
             foreach (var gameCell in parts)
             {
@@ -186,17 +184,42 @@ namespace Kakuro.Core
             if (unSolvedCount == 1)
             {
                 unSolvedCells[0].MarkAsSolved(sum);
-                anythingSolved = true;
+                return true;
             }
-            else if (unSolvedCount > 1)
+
+            if (unSolvedCount > 1)
             {
-                //Work on the remaining (unsolved subset) and see if anymore possibilities can be eliminated
-                var neverUsed = NumberSets[NumberSet.KeyFrom(unSolvedCount, sum)].NeverUsed;
-                foreach (var unSolvedCell in unSolvedCells)
-                {
-                    if (unSolvedCell.EliminateTheNumbers(neverUsed.ToArray()))
-                        anythingSolved = true;
-                }
+                if ( EliminatePossibilitiesBasedOnRemainingUnSolvedSubset(sum, unSolvedCount, unSolvedCells))
+                    return true;
+
+                var possibleSets = NumberSets[NumberSet.KeyFrom(unSolvedCount, sum)].Sets;
+                var alreadySolved = sumCell.GetAlreadySolved(direction);
+
+                var remainingPossibleSets = possibleSets.Where(x=>!x.Intersect(alreadySolved).Any());
+
+                // foreach (var set in remainingPossibleSets)
+                // {
+                //     foreach (var value in set)
+                //     {
+                //         foreach (var unSolvedCell in unSolvedCells)
+                //         {
+                //             unSolvedCell.IsTheValuePossibleSolution(value);
+                //         }
+                //     }
+                // }
+            }
+
+            return false;
+        }
+
+        private bool EliminatePossibilitiesBasedOnRemainingUnSolvedSubset(int sum, int unSolvedCount, List<GameCell> unSolvedCells)
+        {
+            var anythingSolved = false;
+            var neverUsed = NumberSets[NumberSet.KeyFrom(unSolvedCount, sum)].NeverUsed;
+            foreach (var unSolvedCell in unSolvedCells)
+            {
+                if (unSolvedCell.EliminateTheNumbers(neverUsed.ToArray()))
+                    anythingSolved = true;
             }
 
             return anythingSolved;

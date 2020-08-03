@@ -14,6 +14,8 @@ namespace Kakuro.CoreForm
         private Button _btnDraw;
         private Button _btnSolve;
         private Button _btnClear;
+        private Button _btnSample1;
+
         private int _tabStopIndex = 1;
         private int _xSize;
         private int _ySize;
@@ -22,15 +24,6 @@ namespace Kakuro.CoreForm
         {
             InitializeComponent();
             CreateForm();
-
-            HardCodedInputs();
-        }
-
-        private void HardCodedInputs()
-        {
-            _txtXSize.Text = "8";
-            _txtYSize.Text = "10";
-            btnDraw_Click(_btnDraw,EventArgs.Empty);
         }
 
         private void CreateForm()
@@ -103,6 +96,51 @@ namespace Kakuro.CoreForm
             };
             _btnClear.Click += btnClear_Click;
             Controls.Add(_btnClear);
+
+            _btnSample1 = new Button
+            {
+                Location = new Point(360, 5),
+                Name = "btnSample1",
+                Size = new Size(100, 40),
+                Text = "Sample (8x10)",
+                UseVisualStyleBackColor = true,
+                Enabled = true,
+            };  
+            _btnSample1.Click += btnSample1_Click;
+            Controls.Add(_btnSample1);
+        }
+
+        private void btnSample1_Click(object sender, EventArgs e)
+        {
+            var hardCodedInputs = new[,]
+            {
+                { @"x",   @"x",    @"\12",   @"\10", @"x",     @"x",     @"\6",  @"\17",   @"\29", @"x"   },
+                { @"x",   @"10\",  @"",      @"",    @"\10",   @"15\",   @"",    @"",      @"",    @"\16" },
+                { @"x",   @"6\",   @"",      @"",    @"",      @"29\24", @"",    @"",      @"",    @""    },
+                { @"x",   @"x",    @"15\29", @"",    @"",      @"",      @"\16", @"17\18", @"",    @""    },
+                { @"x",   @"41\9", @"",      @"",    @"",      @"",      @"",    @"",      @"",    @"x"   },
+                { @"16\", @"",     @"",      @"\11", @"16\10", @"",      @"",    @"",      @"\9",  @"x"   },
+                { @"11\", @"",     @"",      @"",    @"",      @"23\",   @"",    @"",      @"",    @"x"   },
+                { @"x",   @"24\",  @"",      @"",    @"",      @"x",     @"3\",  @"",      @"",    @"x"   },
+            };
+
+            var xSize = hardCodedInputs.GetLength(0);
+            var ySize = hardCodedInputs.GetLength(1);
+
+            _txtXSize.Text = xSize.ToString();
+            _txtYSize.Text = ySize.ToString();
+
+            btnDraw_Click(_btnDraw, EventArgs.Empty);
+
+            for (int y = 0; y < ySize; y++)
+            {
+                for (int x = 0; x < xSize; x++)
+                {
+                    _txtBoxes[x, y].Text = hardCodedInputs[x, y];
+                }
+            }
+
+            btnSolve_Click(_btnSolve, EventArgs.Empty);
         }
 
         private void btnDraw_Click(object sender, EventArgs e)
@@ -157,95 +195,7 @@ namespace Kakuro.CoreForm
 
         private void HardCodedKakuroInputs()
         {
-            _txtBoxes[0, 0].Text = @"x";
-            _txtBoxes[1, 0].Text = @"x";
-            _txtBoxes[2, 0].Text = @"x";
-            _txtBoxes[3, 0].Text = @"x";
-            _txtBoxes[4, 0].Text = @"x";
-            _txtBoxes[5, 0].Text = @"16\";
-            _txtBoxes[6, 0].Text = @"11\";
-            _txtBoxes[7, 0].Text = @"x";
-
-            _txtBoxes[0, 1].Text = @"x";
-            _txtBoxes[1, 1].Text = @"10\";
-            _txtBoxes[2, 1].Text = @"6\";
-            _txtBoxes[3, 1].Text = @"x";
-            _txtBoxes[4, 1].Text = @"41\9";
-            _txtBoxes[5, 1].Text = @"";
-            _txtBoxes[6, 1].Text = @"";
-            _txtBoxes[7, 1].Text = @"24\";
-
-            _txtBoxes[0, 2].Text = @"\12";
-            _txtBoxes[1, 2].Text = @"";
-            _txtBoxes[2, 2].Text = @"";
-            _txtBoxes[3, 2].Text = @"15\29";
-            _txtBoxes[4, 2].Text = @"";
-            _txtBoxes[5, 2].Text = @"";
-            _txtBoxes[6, 2].Text = @"";
-            _txtBoxes[7, 2].Text = @"";
-
-            _txtBoxes[0, 3].Text = @"\10";
-            _txtBoxes[1, 3].Text = @"";
-            _txtBoxes[2, 3].Text = @"";
-            _txtBoxes[3, 3].Text = @"";
-            _txtBoxes[4, 3].Text = @"";
-            _txtBoxes[5, 3].Text = @"\11";
-            _txtBoxes[6, 3].Text = @"";
-            _txtBoxes[7, 3].Text = @"";
-
-            _txtBoxes[0, 4].Text = @"x";
-            _txtBoxes[1, 4].Text = @"\10";
-            _txtBoxes[2, 4].Text = @"";
-            _txtBoxes[3, 4].Text = @"";
-            _txtBoxes[4, 4].Text = @"";
-            _txtBoxes[5, 4].Text = @"16\10";
-            _txtBoxes[6, 4].Text = @"";
-            _txtBoxes[7, 4].Text = @"";
-
-            _txtBoxes[0, 5].Text = @"x";
-            _txtBoxes[1, 5].Text = @"15\";
-            _txtBoxes[2, 5].Text = @"29\24";
-            _txtBoxes[3, 5].Text = @"";
-            _txtBoxes[4, 5].Text = @"";
-            _txtBoxes[5, 5].Text = @"";
-            _txtBoxes[6, 5].Text = @"23\";
-            _txtBoxes[7, 5].Text = @"x";
-
-            _txtBoxes[0, 6].Text = @"\6";
-            _txtBoxes[1, 6].Text = @"";
-            _txtBoxes[2, 6].Text = @"";
-            _txtBoxes[3, 6].Text = @"\16";
-            _txtBoxes[4, 6].Text = @"";
-            _txtBoxes[5, 6].Text = @"";
-            _txtBoxes[6, 6].Text = @"";
-            _txtBoxes[7, 6].Text = @"3\";
-
-            _txtBoxes[0, 7].Text = @"\17";
-            _txtBoxes[1, 7].Text = @"";
-            _txtBoxes[2, 7].Text = @"";
-            _txtBoxes[3, 7].Text = @"17\18";
-            _txtBoxes[4, 7].Text = @"";
-            _txtBoxes[5, 7].Text = @"";
-            _txtBoxes[6, 7].Text = @"";
-            _txtBoxes[7, 7].Text = @"";
-
-            _txtBoxes[0, 8].Text = @"\29";
-            _txtBoxes[1, 8].Text = @"";
-            _txtBoxes[2, 8].Text = @"";
-            _txtBoxes[3, 8].Text = @"";
-            _txtBoxes[4, 8].Text = @"";
-            _txtBoxes[5, 8].Text = @"\9";
-            _txtBoxes[6, 8].Text = @"";
-            _txtBoxes[7, 8].Text = @"";
-
-            _txtBoxes[0, 9].Text = @"x";
-            _txtBoxes[1, 9].Text = @"\16";
-            _txtBoxes[2, 9].Text = @"";
-            _txtBoxes[3, 9].Text = @"";
-            _txtBoxes[4, 9].Text = @"x";
-            _txtBoxes[5, 9].Text = @"x";
-            _txtBoxes[6, 9].Text = @"x";
-            _txtBoxes[7, 9].Text = @"x";
+            
         }
 
         private void btnSolve_Click(object sender, EventArgs e)

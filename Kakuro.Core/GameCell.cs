@@ -71,5 +71,10 @@ namespace Kakuro.Core
 
             return displayValue;
         }
+
+        public bool IsTheValuePossibleSolution(in int value)
+        {
+            return !_eliminatedValues.Contains(value);
+        }
     }
 }
